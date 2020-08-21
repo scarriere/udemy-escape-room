@@ -14,6 +14,18 @@ UGrabber::UGrabber()
 	// ...
 }
 
+template<class T>
+T* UGrabber::SafeGetComponent(FString name)
+{
+	T* Component = GetOwner()->FindComponentByClass<T>();
+	FString ClassName(typeid(Component).name());
+	if (!Component)
+	{
+		UE_LOG(LogTemp, Error, TEXT("No %s found on %s"), *ClassName, *GetOwner()->GetName());
+	}
+	return Component;
+}
+
 
 // Called when the game starts
 void UGrabber::BeginPlay()
@@ -22,16 +34,23 @@ void UGrabber::BeginPlay()
 
 	UE_LOG(LogTemp, Warning, TEXT("Grabber reporting for duty"))
 
-	PhysicsHandle = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
+	PhysicsHandle = SafeGetComponent<UPhysicsHandleComponent>(FString("Physics Handle Component"));
 	if (PhysicsHandle)
 	{
+
 	}
-	else
+
+	InputComponent = SafeGetComponent<UInputComponent>(FString("input Component"));
+	if (InputComponent)
 	{
-		UE_LOG(LogTemp, Error, TEXT("No physics handle component found on %s"), *GetOwner()->GetName());
+		InputComponent->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
 	}
 }
 
+void UGrabber::Grab()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Grap pressed"))
+}
 
 // Called every frame
 void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
