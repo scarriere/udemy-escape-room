@@ -1,7 +1,7 @@
 // Copyright Samuel Carriere 2020
 
-#include "OpenDoor.h"
 
+#include "OpenDoor.h"
 
 UOpenDoor::UOpenDoor()
 {
