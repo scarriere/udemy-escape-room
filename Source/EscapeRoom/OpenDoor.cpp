@@ -19,12 +19,25 @@ void UOpenDoor::BeginPlay()
 	CurrentYaw = InitialYaw;
 	OpenAngle += InitialYaw;
 
-	if(!PressurePlate)
+	FindAudioComponent();
+	VerifyPressurePlate();
+}
+
+void UOpenDoor::FindAudioComponent()
+{
+	AudioComponent = GetOwner()->FindComponentByClass<UAudioComponent>();
+	if (!AudioComponent)
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s Missing audio component!"), *GetOwner()->GetName())
+	}
+}
+
+void UOpenDoor::VerifyPressurePlate()
+{
+	if (!PressurePlate)
 	{
 		UE_LOG(LogTemp, Error, TEXT("%s has the open door component on it, but no PressurePlate set"), *GetOwner()->GetName());
 	}
-
-	ActorThatOpen = GetWorld()->GetFirstPlayerController()->GetPawn();
 }
 
 void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -48,6 +61,11 @@ void UOpenDoor::OpenDoor(float DeltaTime)
 	FRotator DoorRotation = GetOwner()->GetActorRotation();
 	DoorRotation.Yaw = CurrentYaw;
 	GetOwner()->SetActorRotation(DoorRotation);
+
+	if (AudioComponent && !DoorIsOpening) {
+		AudioComponent->Play();
+		DoorIsOpening = true;
+	}
 }
 
 void UOpenDoor::CloseDoor(float DeltaTime)
@@ -56,6 +74,11 @@ void UOpenDoor::CloseDoor(float DeltaTime)
 	FRotator DoorRotation = GetOwner()->GetActorRotation();
 	DoorRotation.Yaw = CurrentYaw;
 	GetOwner()->SetActorRotation(DoorRotation);
+
+	if (AudioComponent && DoorIsOpening) {
+		AudioComponent->Play();
+		DoorIsOpening = false;
+	}
 }
 
 float UOpenDoor::TotalMassOfActors() const
@@ -63,6 +86,7 @@ float UOpenDoor::TotalMassOfActors() const
 	float TotalMass = 0.f;
 
 	TArray<AActor*> OverlappingActors;
+	if (!PressurePlate) { return TotalMass; }
 	PressurePlate->GetOverlappingActors(OUT OverlappingActors);
 
 	for (AActor* Actor: OverlappingActors)
