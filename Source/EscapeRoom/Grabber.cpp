@@ -62,7 +62,8 @@ void UGrabber::ToggleGrab()
 			PhysicsHandle->GrabComponentAtLocation(
 				ComponentToGrab,
 				NAME_None,
-				GetPlayersReach()
+				//GetPlayersReach()
+				HitResult.GetActor()->GetActorLocation()
 			);
 		}
 	}
@@ -103,6 +104,17 @@ FVector UGrabber::GetPlayersReach() const
 	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
 		OUT PlayerViewPointLocation,
 		OUT PlayerViewPointRotation
+	);
+
+	DrawDebugLine(
+		GetWorld(),
+		PlayerViewPointLocation,
+		PlayerViewPointLocation + PlayerViewPointRotation.Vector() * Reach,
+		FColor::Blue,
+		false,
+		0.f,
+		0,
+		1.f
 	);
 
 	return PlayerViewPointLocation + PlayerViewPointRotation.Vector() * Reach;
