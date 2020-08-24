@@ -40,32 +40,32 @@ void UGrabber::SetupInputComponent()
 	InputComponent = SafeGetComponent<UInputComponent>(FString("input Component"));
 	if (InputComponent)
 	{
-		InputComponent->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
-		InputComponent->BindAction("Grab", IE_Released, this, &UGrabber::Release);
+		InputComponent->BindAction("Grab", IE_Pressed, this, &UGrabber::ToggleGrab);
 	}
 }
 
-void UGrabber::Grab()
-{
-	FHitResult HitResult = GetFirstPhysicsBodyInReach();
-	UPrimitiveComponent* ComponentToGrab = HitResult.GetComponent();
-
-	if (HitResult.GetActor())
-	{
-		if (!PhysicsHandle) { return; }
-		PhysicsHandle->GrabComponentAtLocation(
-			ComponentToGrab,
-			NAME_None,
-			GetPlayersReach()
-		);
-	}
-}
-
-
-void UGrabber::Release()
+void UGrabber::ToggleGrab()
 {
 	if (!PhysicsHandle) { return; }
-	PhysicsHandle->ReleaseComponent();
+
+	if (PhysicsHandle->GrabbedComponent)
+	{
+		PhysicsHandle->ReleaseComponent();
+	}
+	else
+	{
+		FHitResult HitResult = GetFirstPhysicsBodyInReach();
+		UPrimitiveComponent* ComponentToGrab = HitResult.GetComponent();
+
+		if (HitResult.GetActor())
+		{
+			PhysicsHandle->GrabComponentAtLocation(
+				ComponentToGrab,
+				NAME_None,
+				GetPlayersReach()
+			);
+		}
+	}
 }
 
 void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

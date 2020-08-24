@@ -26,6 +26,7 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+	UPROPERTY(EditAnywhere)
 	float Reach = 200.f;
 	
 	UPROPERTY()
@@ -34,8 +35,7 @@ private:
 	UPROPERTY()
 	UInputComponent* InputComponent = nullptr;
 
-	void Grab();
-	void Release();
+	void ToggleGrab();
 	void FindPhysicsHandle();
 	void SetupInputComponent();
 	FHitResult GetFirstPhysicsBodyInReach() const;
