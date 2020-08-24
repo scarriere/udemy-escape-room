@@ -16,18 +16,14 @@ class ESCAPEROOM_API UGrabber : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
 	UGrabber();
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	template<class T>
+	T* SafeGetComponent(FString name);
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	template<class T>
-	T* SafeGetComponent(FString name);
 
 private:
 	float Reach = 100.f;
@@ -35,4 +31,8 @@ private:
 	UInputComponent* InputComponent = nullptr;
 
 	void Grab();
+	void Release();
+	void FindPhysicsHandle();
+	void SetupInputComponent();
+	FHitResult GetFirstPhysicsBodyInReach() const;
 };
